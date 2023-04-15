@@ -14,6 +14,8 @@ public class GripHold : HandHold
 
     protected override void Grab(SelectEnterEventArgs args)
     {
+        print("grip grab");
+        
         base.Grab(new SelectEnterEventArgs
         {
             interactorObject = args.interactorObject,
@@ -25,6 +27,8 @@ public class GripHold : HandHold
 
     protected override void Drop(SelectExitEventArgs args)
     {
+        print("grip drop");
+
         base.Drop(new SelectExitEventArgs
         {
             interactorObject = args.interactorObject,

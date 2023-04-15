@@ -3,14 +3,25 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+
+  tags:
+  - Loot
+  - Gun
+  - ShopItem
+  - ItemThatIsPulled
+  - ItemThatPulls
+  - SecurityPlane
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Hand
   - Water
   - UI
+  - Loots
+  - Gun
+  - Harpoon
+  - GunHeld
   - 
   - 
   - 

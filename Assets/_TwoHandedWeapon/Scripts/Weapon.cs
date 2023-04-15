@@ -25,26 +25,22 @@ public class Weapon : XRGrabInteractable
         
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         selectEntered.RemoveListener(SetInitialRotation);
     }
 
     private void SetInitialRotation(SelectEnterEventArgs args)
     {
         Quaternion newRotation = Quaternion.Euler(gripRotation);
-        args.interactorObject.GetAttachTransform(this).localRotation = newRotation;
+        attachTransform.localRotation = newRotation;
     }
 
     public void SetGripHand(IXRSelectInteractor interactor)
     {
         _gripHand = interactor;
-        OnSelectEntered(new SelectEnterEventArgs
-        {
-            interactorObject = interactor,
-            interactableObject = this,
-            manager = interactionManager
-        });
+        interactionManager.SelectEnter(interactor,this);
     }
 
     public void ClearGripHand(IXRSelectInteractor interactor)
@@ -60,7 +56,7 @@ public class Weapon : XRGrabInteractable
 
     public void SetGuardHand(IXRSelectInteractor interactor)
     {
-
+        
     }
 
     public void ClearGuardHand(IXRSelectInteractor interactor)

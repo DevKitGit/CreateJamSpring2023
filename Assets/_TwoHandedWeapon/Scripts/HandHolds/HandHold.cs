@@ -7,6 +7,7 @@ public class HandHold : XRBaseInteractable
     public void Setup(Weapon weapon)
     {
         this.weapon = weapon;
+        
     }
 
     protected override void Awake()
@@ -44,8 +45,10 @@ public class HandHold : XRBaseInteractable
 
     private void TryToHideHand(IXRSelectInteractor interactor, bool hide)
     {
-        if (interactor is not Hand hand) return;
-        hand.SetVisibility(hide);
+        if (interactor is Hand hand)
+        {
+            hand.SetVisibility(hide);
+        }
     }
 
     public void BreakHold(IXRSelectInteractor interactor)
