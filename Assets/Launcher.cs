@@ -18,6 +18,10 @@ public class Launcher : MonoBehaviour
     [SerializeField] private float minimumAttachDistance;
     [SerializeField] private float minimumPullAttachDistance;
 
+    [SerializeField] private AudioSource _harpoonShot;
+    [SerializeField] private AudioClip onFireOne, onFireTwo, onReload, detatch;
+    
+    
     private Stopwatch _stopwatch;
     private Harpoon _spawnedHarpoon;
     private Harpoon.HitType currentHitType;
@@ -33,6 +37,7 @@ public class Launcher : MonoBehaviour
         var spawned = Instantiate(harpoonPrefab, spawnAnchor.position, spawnAnchor.rotation);
         spawned.transform.parent = null;
         _spawnedHarpoon = spawned.GetComponentInChildren<Harpoon>();
+        _harpoonShot.PlayOneShot(onReload);
     }
     
     public void Fire()
@@ -43,8 +48,15 @@ public class Launcher : MonoBehaviour
         }
         _spawnedHarpoon.Fire(transform.forward);
         _stopwatch = Stopwatch.StartNew();
+        //play sound here
+        _harpoonShot.PlayOneShot(onFireOne);
+        Invoke(nameof(PlayMe), .5f);
     }
-    
+
+    private void PlayMe()
+    {
+        _harpoonShot.PlayOneShot(onFireTwo);
+    }
     public void Detach()
     {
         if (_spawnedHarpoon == null || !_spawnedHarpoon.fired || _spawnedHarpoon.detached)
@@ -54,6 +66,7 @@ public class Launcher : MonoBehaviour
         _spawnedHarpoon.Detach(transform.forward);
         _spawnedHarpoon = null;
         Invoke(nameof(SpawnHarpoon),reloadSpeed);
+        _harpoonShot.PlayOneShot(detatch);
     }
     
     void Update()

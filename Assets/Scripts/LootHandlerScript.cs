@@ -9,7 +9,8 @@ using UnityEngine.Events;
 public class LootHandlerScript : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI lootCounterText;
-    
+
+    [SerializeField] private AudioSource _getLooties;
     
     [SerializeField] private SphereCollider loots;
     [SerializeField] private List<SphereCollider> purchasables;
@@ -54,6 +55,11 @@ public class LootHandlerScript : MonoBehaviour
         }
     }
 
+    void getLoot()
+    {
+        _getLooties.Play();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         var cost = 0;
@@ -62,6 +68,7 @@ public class LootHandlerScript : MonoBehaviour
             _lootCounter += 1;
             lootCounterText.text = _lootCounter.ToString();
             lootCounterText.ForceMeshUpdate(true);
+            getLoot();
             Destroy(loots.gameObject);
         }
 
