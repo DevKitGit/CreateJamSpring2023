@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,9 +13,15 @@ public class Launcher : MonoBehaviour
     [SerializeField] private GameObject harpoonPrefab;
     [SerializeField] private Transform spawnAnchor;
     [SerializeField] private Transform boat;
+    [SerializeField] private float boatMoveSpeed;
+    [SerializeField] private float itemPullMoveSpeed;
+    [SerializeField] private float minimumAttachDistance;
+    [SerializeField] private float minimumPullAttachDistance;
 
     private Stopwatch _stopwatch;
     private Harpoon _spawnedHarpoon;
+    private Harpoon.HitType currentHitType;
+    private GameObject currentHitTarget;
     public Transform SpawnAnchor => spawnAnchor;
     void Start()
     {
@@ -45,29 +52,71 @@ public class Launcher : MonoBehaviour
             return;
         }        
         _spawnedHarpoon.Detach(transform.forward);
+        _spawnedHarpoon = null;
         Invoke(nameof(SpawnHarpoon),reloadSpeed);
     }
     
     void Update()
     {
-        if (_spawnedHarpoon is { fired: true, detached: false })
+        if (_spawnedHarpoon is { fired: true, detached:false,hasHitOnce:true})
         {
-            if (_stopwatch.ElapsedMilliseconds > fallbackTimeoutSec * 1000)
+            Vector3 target;
+            Vector3 origin;
+            switch (currentHitType)
             {
-                Detach();
-                return;
+                case Harpoon.HitType.None:
+                case Harpoon.HitType.SecurityBorder:
+                    break;
+                case Harpoon.HitType.ItemThatPulls:
+                    target = currentHitTarget.transform.position;
+                    origin = boat.position;
+                    target.y = origin.y;
+                    if (CheckIfTooCloseToAttached(origin, target,minimumAttachDistance))
+                    {
+                        Detach();
+                    }
+                    boat.position = Vector3.MoveTowards(origin, target, boatMoveSpeed * Time.deltaTime);
+                    break;
+                case Harpoon.HitType.ItemThatIsPulled:
+                case Harpoon.HitType.ShopItem:
+                    target = boat.position;
+                    origin = currentHitTarget.transform.position;
+                    target.y = origin.y;
+                    if (CheckIfTooCloseToAttached(origin, target,minimumPullAttachDistance))
+                    {
+                        Detach();
+                        TryGrab();
+                    }
+                    currentHitTarget.transform.position = Vector3.MoveTowards(origin, target, itemPullMoveSpeed * Time.deltaTime);
+                    break;
             }
-            PullBoatCloser();
+            return;
         }
+        if (_spawnedHarpoon is not { fired: true, detached: false }) { return; }
+        if (_stopwatch.ElapsedMilliseconds < fallbackTimeoutSec * 1000) { return; }
+        Detach();
     }
 
-    private void PullBoatCloser()
+    private void TryGrab()
     {
-        
+        throw new NotImplementedException();
     }
-    
+
+    private bool CheckIfTooCloseToAttached(Vector3 origin, Vector3 target, float distance)
+    {
+        return Vector3.Distance(origin, target) < distance;
+    }
     public void HarpoonHitTarget(Harpoon.HitType hitType, GameObject hitTarget)
     {
+        if (hitType is Harpoon.HitType.None or Harpoon.HitType.SecurityBorder)
+        {
+            Detach();
+            currentHitTarget = null;
+            currentHitType = Harpoon.HitType.None;
+            return;
+        }
         
+        currentHitType = hitType;
+        currentHitTarget = hitTarget;
     }
 }

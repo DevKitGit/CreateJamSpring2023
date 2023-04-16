@@ -21,6 +21,10 @@ public class TwoHandedGrabInteractable : XRGrabInteractable
 
     public override bool IsSelectableBy(IXRSelectInteractor interactor)
     {
+        if (interactor is XRSocketInteractor)
+        {
+            return base.IsSelectableBy(interactor);
+        }
         if (!isSelected)
         {
             return interactor.interactionLayers == rightHandedLayer && base.IsSelectableBy(interactor);
@@ -57,11 +61,11 @@ public class TwoHandedGrabInteractable : XRGrabInteractable
     protected override void OnSelectEntering(SelectEnterEventArgs args)
     {
         
-        if (gameObject.layer != LayerMask.NameToLayer("Gun"))
+        if (gameObject.layer != LayerMask.NameToLayer("GunHeld"))
         {
             _previousLayer = gameObject.layer;
         }
-        gameObject.SetLayerRecursively(LayerMask.NameToLayer("Gun"));
+        gameObject.SetLayerRecursively(LayerMask.NameToLayer("GunHeld"));
         base.OnSelectEntering(args);
     }
     protected override void OnSelectExited(SelectExitEventArgs args)

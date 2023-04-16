@@ -3,25 +3,27 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-
   tags:
-  - Loot
+  - SecurityPlane
   - Gun
+  - Loot
   - ShopItem
   - ItemThatIsPulled
   - ItemThatPulls
-  - SecurityPlane
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Hand
+  - 
   - Water
   - UI
-  - Loots
   - Gun
-  - Harpoon
   - GunHeld
+  - Harpoon
+  - Hand
+  - Loot
+  - Sockets
+  - Bob
   - 
   - 
   - 
@@ -41,13 +43,6 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - POLARIS RAYCAST
-  - POLARIS SPLINE
   m_SortingLayers:
   - name: Default
     uniqueID: 0
