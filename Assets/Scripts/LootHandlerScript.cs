@@ -5,31 +5,24 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem.iOS;
+using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 public class LootHandlerScript : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI lootCounterText;
-
-    [SerializeField] private AudioSource _getLooties;
-    [SerializeField] private AudioClip lootEnter;
-    
-    
+    [FormerlySerializedAs("_getLooties")] [SerializeField] private AudioSource _audiosource;
     [SerializeField] private SphereCollider loots;
     [SerializeField] private List<SphereCollider> purchasables;
     [SerializeField] private float movespeed = 1f;
     [SerializeField] private Transform boatTransform;
-    private bool _ableToBuy = true;
-    
     [SerializeField] private List<GameObject> _boughtItems;
-    
-    
-    
+    [FormerlySerializedAs("_onItemGet")] [SerializeField] private List<AudioClip> _coinSounds = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> _onRumBuy = new List<AudioClip>();
     public List<Transform> orgTransform;
 
+    private bool _ableToBuy = true;
     private int _currentPurchaseAttempt;
-    
-    
     private int _lootCounter = 3;
 
     public void Start()
@@ -58,6 +51,16 @@ public class LootHandlerScript : MonoBehaviour
     }
     
 
+
+    private void PlayRandomRumSound()
+    {
+        _audiosource.PlayOneShot(_onRumBuy[Random.Range(0,_onRumBuy.Count)]);
+    }
+    
+    private void PlayRandomCoinsSound()
+    {
+        _audiosource.PlayOneShot(_coinSounds[Random.Range(0,_coinSounds.Count)]);
+    }
     private void OnTriggerEnter(Collider other)
     {
         var cost = 0;
@@ -66,7 +69,6 @@ public class LootHandlerScript : MonoBehaviour
             _lootCounter += 1;
             lootCounterText.text = _lootCounter.ToString();
             lootCounterText.ForceMeshUpdate(true);
-            _getLooties.PlayOneShot(lootEnter);
             Destroy(loots.gameObject);
         }
 

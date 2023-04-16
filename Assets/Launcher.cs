@@ -100,7 +100,6 @@ public class Launcher : MonoBehaviour
                     if (CheckIfTooCloseToAttached(origin, target,minimumPullAttachDistance))
                     {
                         Detach();
-                        TryGrab();
                     }
                     currentHitTarget.transform.position = Vector3.MoveTowards(origin, target, itemPullMoveSpeed * Time.deltaTime);
                     break;
@@ -112,11 +111,6 @@ public class Launcher : MonoBehaviour
         Detach();
     }
     
-    private void TryGrab()
-    {
-        throw new NotImplementedException();
-    }
-
     private bool CheckIfTooCloseToAttached(Vector3 origin, Vector3 target, float distance)
     {
         return Vector3.Distance(origin, target) < distance;
