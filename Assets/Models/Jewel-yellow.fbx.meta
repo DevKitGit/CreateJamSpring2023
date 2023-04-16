@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 46e841c6740f2e84b8a577a6d4628fc0
+guid: 68512d6553d78424dbd2bdc3d1b4678b
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -7,8 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: phong1SG
-    second: {fileID: 2100000, guid: ae62674460f9caf4d9879bae721b8372, type: 2}
+      name: Yellow_jewel_03
+    second: {fileID: -4016989449329944173, guid: 3288cb039a3233345a4f0b82b0e1af61, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

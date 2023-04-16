@@ -1,9 +1,19 @@
 fileFormatVersion: 2
-guid: 56a6cba43d6432a4b9c1923e2bc51671
+guid: 29bd64852e2c34b44aacc2eea0a13317
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Gold_ring.004
+    second: {fileID: 2100000, guid: bdaab866531cd344c8307eb0bdf58fef, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Pink_ring_03
+    second: {fileID: 2100000, guid: fe85dc83024a1554f8fdb436f8b8acd2, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
