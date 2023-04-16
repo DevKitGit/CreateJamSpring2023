@@ -5,12 +5,15 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem.iOS;
 
 public class LootHandlerScript : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI lootCounterText;
 
     [SerializeField] private AudioSource _getLooties;
+    [SerializeField] private AudioClip lootEnter;
+    
     
     [SerializeField] private SphereCollider loots;
     [SerializeField] private List<SphereCollider> purchasables;
@@ -54,11 +57,7 @@ public class LootHandlerScript : MonoBehaviour
                 orgTransform[_currentPurchaseAttempt].transform.position, movespeed*Time.deltaTime);
         }
     }
-
-    void getLoot()
-    {
-        _getLooties.Play();
-    }
+    
 
     private void OnTriggerEnter(Collider other)
     {
@@ -68,7 +67,7 @@ public class LootHandlerScript : MonoBehaviour
             _lootCounter += 1;
             lootCounterText.text = _lootCounter.ToString();
             lootCounterText.ForceMeshUpdate(true);
-            getLoot();
+            _getLooties.PlayOneShot(lootEnter);
             Destroy(loots.gameObject);
         }
 

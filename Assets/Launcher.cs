@@ -18,8 +18,8 @@ public class Launcher : MonoBehaviour
     [SerializeField] private float minimumAttachDistance;
     [SerializeField] private float minimumPullAttachDistance;
 
-    [SerializeField] private AudioSource _harpoonShot;
-    [SerializeField] private AudioClip onFireOne, onFireTwo, onReload, detatch;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip onFireOne, onFireTwo, onReload, detatch, pulling;
     
     
     private Stopwatch _stopwatch;
@@ -37,7 +37,7 @@ public class Launcher : MonoBehaviour
         var spawned = Instantiate(harpoonPrefab, spawnAnchor.position, spawnAnchor.rotation);
         spawned.transform.parent = null;
         _spawnedHarpoon = spawned.GetComponentInChildren<Harpoon>();
-        _harpoonShot.PlayOneShot(onReload);
+        _audioSource.PlayOneShot(onReload);
     }
     
     public void Fire()
@@ -49,13 +49,13 @@ public class Launcher : MonoBehaviour
         _spawnedHarpoon.Fire(transform.forward);
         _stopwatch = Stopwatch.StartNew();
         //play sound here
-        _harpoonShot.PlayOneShot(onFireOne);
-        Invoke(nameof(PlayMe), .5f);
+        _audioSource.PlayOneShot(onFireOne);
+        Invoke(nameof(PlayMe), .1f);
     }
 
     private void PlayMe()
     {
-        _harpoonShot.PlayOneShot(onFireTwo);
+        _audioSource.PlayOneShot(onFireTwo);
     }
     public void Detach()
     {
@@ -65,8 +65,10 @@ public class Launcher : MonoBehaviour
         }        
         _spawnedHarpoon.Detach(transform.forward);
         _spawnedHarpoon = null;
+        _audioSource.loop = false;
+        _audioSource.Stop();
         Invoke(nameof(SpawnHarpoon),reloadSpeed);
-        _harpoonShot.PlayOneShot(detatch);
+        _audioSource.PlayOneShot(detatch);
     }
     
     void Update()
@@ -109,7 +111,7 @@ public class Launcher : MonoBehaviour
         if (_stopwatch.ElapsedMilliseconds < fallbackTimeoutSec * 1000) { return; }
         Detach();
     }
-
+    
     private void TryGrab()
     {
         throw new NotImplementedException();
@@ -131,5 +133,7 @@ public class Launcher : MonoBehaviour
         
         currentHitType = hitType;
         currentHitTarget = hitTarget;
+        _audioSource.loop = true;
+        _audioSource.PlayOneShot(pulling);
     }
 }
