@@ -64,65 +64,19 @@ public class LootHandlerScript : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         var cost = 0;
-        if (other.GetComponent<SphereCollider>() == loots.GetComponent<SphereCollider>())
+        Item item = other.GetComponentInChildren<Item>();
+        if (item != null)
         {
-            _lootCounter += 1;
-            lootCounterText.text = _lootCounter.ToString();
+            _lootCounter += item.value;
+            lootCounterText.SetText(_lootCounter.ToString());
             lootCounterText.ForceMeshUpdate(true);
-            Destroy(loots.gameObject);
-        }
-
-        foreach (SphereCollider purchasable in purchasables)
-        {
-            if (other.GetComponent<SphereCollider>() == purchasable.GetComponent<SphereCollider>())
+            item.OnItemReceived.Invoke();
+            Transform topmostParent = item.transform;
+            while (topmostParent.parent != null)
             {
-                switch (purchasable.name)
-                {
-                    case "Item1":
-                        cost = 3;
-                        _currentPurchaseAttempt = 0;
-                        if (cost <= _lootCounter && _ableToBuy)
-                        {
-                            _lootCounter -= cost;
-                            lootCounterText.text = _lootCounter.ToString();
-                            lootCounterText.ForceMeshUpdate(true);
-                        }
-                        else
-                        {
-                            _ableToBuy = false;
-                        }
-                        break;
-                    case "Item2":
-                        cost = 1;
-                        _currentPurchaseAttempt = 1;
-                        if (cost <= _lootCounter && _ableToBuy)
-                        {
-                            _lootCounter -= cost;
-                            lootCounterText.text = _lootCounter.ToString();
-                            lootCounterText.ForceMeshUpdate(true);
-                        }
-                        else
-                        {
-                            _ableToBuy = false;
-                            
-                        }
-                        break;
-                    case "Item3":
-                        cost = 2;
-                        _currentPurchaseAttempt = 2;
-                        if (cost <= _lootCounter && _ableToBuy)
-                        {
-                            _lootCounter -= cost;
-                            lootCounterText.text = _lootCounter.ToString();
-                            lootCounterText.ForceMeshUpdate(true);
-                        }
-                        else
-                        {
-                            _ableToBuy = false;
-                        }
-                        break;
-                }
+                topmostParent = topmostParent.parent;
             }
+            Destroy(topmostParent.gameObject);
         }
     }
 }
