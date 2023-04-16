@@ -46,7 +46,6 @@ public class LootHandlerScript : MonoBehaviour
                 boatTransform.position, movespeed*Time.deltaTime);
             if (Vector3.Distance(purchasables[_currentPurchaseAttempt].transform.position, boatTransform.position) <= 0)
             {
-                print("Added and removed");
                 _boughtItems.Add(purchasables[_currentPurchaseAttempt].gameObject);
                 purchasables.RemoveAt(_currentPurchaseAttempt);
             }
