@@ -17,10 +17,11 @@ public class HandHold : XRBaseInteractable
         selectExited.AddListener(Drop);
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
         selectEntered.RemoveListener(Grab);
         selectExited.RemoveListener(Drop);
+        base.OnDestroy();
     }
 
     protected virtual void BeginAction(IXRSelectInteractor interactor)
@@ -45,6 +46,7 @@ public class HandHold : XRBaseInteractable
 
     private void TryToHideHand(IXRSelectInteractor interactor, bool hide)
     {
+        print($"BUGFIX: Hands dont disappear, figure out why, GO name: {interactor.transform.gameObject.name}");
         if (interactor is Hand hand)
         {
             hand.SetVisibility(hide);

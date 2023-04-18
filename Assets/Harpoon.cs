@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -14,14 +15,15 @@ public class Harpoon : MonoBehaviour
     [SerializeField] private Rigidbody ropeBase;
     [SerializeField] private Rigidbody head;
     [SerializeField] private Transform headTransform;
-    
+
+    public Transform GetHead => headTransform;
     private LineRenderer _lineRenderer;
     public enum HitType
     {
-        None,
+        Untagged = 0,
         ItemThatPulls,
         ItemThatIsPulled,
-        SecurityBorder,
+        SecurityPlane,
         ShopItem
     }
 
@@ -94,27 +96,43 @@ public class Harpoon : MonoBehaviour
     private void OnCollisionEnter(Collision other)
     {
         if (hasHitOnce) { return; }
-
+        if (!fired) {return;}
         GameObject target = other.gameObject;
         var wasGunHit = target.CompareTag("Gun");
         if (wasGunHit) { return; }
         hasHitOnce = true;
         head.isKinematic = true;
         head.constraints = RigidbodyConstraints.FreezeAll;
-        head.transform.parent = target.transform;
+        Transform topmostParent = target.transform;
+        while (topmostParent.parent != null)
+        {
+            topmostParent = topmostParent.parent;
+        }
+        head.transform.parent = topmostParent;
+        var list = topmostParent.GetComponentsInChildren<Item>();
+        foreach (var item in list)
+        {
+            item.hasBeenHit = true;
+        }
         hitOffset = target.transform.InverseTransformPoint(head.transform.position);
-        if (target.CompareTag("ItemThatPulls")){ _launcher.HarpoonHitTarget(HitType.ItemThatPulls,target); }
-        else if (target.CompareTag("ItemThatIsPulled")){ _launcher.HarpoonHitTarget(HitType.ItemThatIsPulled,target); }
-        else if (target.CompareTag("SecurityPlane")) { _launcher.HarpoonHitTarget(HitType.SecurityBorder,target); }
-        else if (target.CompareTag("ShopItem")) { _launcher.HarpoonHitTarget(HitType.ShopItem,target); }
-        else if (target.CompareTag("Untagged")){ _launcher.HarpoonHitTarget(HitType.None,target); }
-        currentTarget = target;
 
+        if(Enum.TryParse(target.tag, true, out HitType hitType));
+        _launcher.HarpoonHitTarget(hitType, target);
+        currentTarget = target;
     }
     private void MakePassive()
     {
         _passive = true;
         SetRigidbodyInteractive(head,false);
         SetRigidbodyInteractive(ropeBase,false);
+        enabled = false;
+    }
+
+    public void DestroyHarpoon()
+    {
+        
+        _launcher.Detach();
+        Destroy(ropeBase.gameObject);
+        Destroy(head.gameObject);
     }
 }

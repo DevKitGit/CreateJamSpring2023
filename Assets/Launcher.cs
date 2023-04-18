@@ -25,7 +25,8 @@ public class Launcher : MonoBehaviour
     private Stopwatch _stopwatch;
     private Harpoon _spawnedHarpoon;
     private Harpoon.HitType currentHitType;
-    private GameObject currentHitTarget;
+    private GameObject currentHitWorldPos;
+
     public Transform SpawnAnchor => spawnAnchor;
     void Start()
     {
@@ -62,7 +63,7 @@ public class Launcher : MonoBehaviour
         if (_spawnedHarpoon == null || !_spawnedHarpoon.fired || _spawnedHarpoon.detached)
         {
             return;
-        }        
+        }
         _spawnedHarpoon.Detach(transform.forward);
         _spawnedHarpoon = null;
         _audioSource.loop = false;
@@ -79,11 +80,11 @@ public class Launcher : MonoBehaviour
             Vector3 origin;
             switch (currentHitType)
             {
-                case Harpoon.HitType.None:
-                case Harpoon.HitType.SecurityBorder:
+                case Harpoon.HitType.Untagged:
+                case Harpoon.HitType.SecurityPlane:
                     break;
                 case Harpoon.HitType.ItemThatPulls:
-                    target = currentHitTarget.transform.position;
+                    target = _spawnedHarpoon.GetHead.position;
                     origin = boat.position;
                     target.y = origin.y;
                     if (CheckIfTooCloseToAttached(origin, target,minimumAttachDistance))
@@ -95,13 +96,13 @@ public class Launcher : MonoBehaviour
                 case Harpoon.HitType.ItemThatIsPulled:
                 case Harpoon.HitType.ShopItem:
                     target = boat.position;
-                    origin = currentHitTarget.transform.position;
+                    origin = currentHitWorldPos.transform.position;
                     target.y = origin.y;
                     if (CheckIfTooCloseToAttached(origin, target,minimumPullAttachDistance))
                     {
                         Detach();
                     }
-                    currentHitTarget.transform.position = Vector3.MoveTowards(origin, target, itemPullMoveSpeed * Time.deltaTime);
+                    currentHitWorldPos.transform.position = Vector3.MoveTowards(origin, target, itemPullMoveSpeed * Time.deltaTime);
                     break;
             }
             return;
@@ -117,16 +118,16 @@ public class Launcher : MonoBehaviour
     }
     public void HarpoonHitTarget(Harpoon.HitType hitType, GameObject hitTarget)
     {
-        if (hitType is Harpoon.HitType.None or Harpoon.HitType.SecurityBorder)
+        if (hitType is Harpoon.HitType.Untagged or Harpoon.HitType.SecurityPlane)
         {
             Detach();
-            currentHitTarget = null;
-            currentHitType = Harpoon.HitType.None;
+            currentHitWorldPos = null;
+            currentHitType = Harpoon.HitType.Untagged;
             return;
         }
         
         currentHitType = hitType;
-        currentHitTarget = hitTarget;
+        currentHitWorldPos = hitTarget;
         _audioSource.loop = true;
         _audioSource.PlayOneShot(pulling);
     }

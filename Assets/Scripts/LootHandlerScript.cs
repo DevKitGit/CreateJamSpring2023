@@ -11,9 +11,9 @@ using Random = UnityEngine.Random;
 public class LootHandlerScript : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI lootCounterText;
-    [FormerlySerializedAs("_getLooties")] [SerializeField] private AudioSource _audiosource;
+    [SerializeField] private AudioSource _audiosource;
     [SerializeField] private SphereCollider loots;
-    [SerializeField] private List<SphereCollider> purchasables;
+    [SerializeField] private List<GameObject> purchasables;
     [SerializeField] private float movespeed = 1f;
     [SerializeField] private Transform boatTransform;
     [SerializeField] private List<GameObject> _boughtItems;
@@ -31,32 +31,12 @@ public class LootHandlerScript : MonoBehaviour
         lootCounterText.ForceMeshUpdate(true);
     }
 
-    public void Update()
-    {
-        if (_ableToBuy)
-        {
-            purchasables[_currentPurchaseAttempt].transform.position = Vector3.MoveTowards(purchasables[_currentPurchaseAttempt].transform.position,
-                boatTransform.position, movespeed*Time.deltaTime);
-            if (Vector3.Distance(purchasables[_currentPurchaseAttempt].transform.position, boatTransform.position) <= 0)
-            {
-                _boughtItems.Add(purchasables[_currentPurchaseAttempt].gameObject);
-                purchasables.RemoveAt(_currentPurchaseAttempt);
-            }
-        }
-        if (!_ableToBuy && Vector3.Distance(purchasables[_currentPurchaseAttempt].transform.position, boatTransform.position) <= 0)
-        {
-            purchasables[_currentPurchaseAttempt].transform.position = Vector3.MoveTowards(purchasables[_currentPurchaseAttempt].transform.position,
-                orgTransform[_currentPurchaseAttempt].transform.position, movespeed*Time.deltaTime);
-        }
-    }
-    
-
-
     private void PlayRandomRumSound()
     {
         _audiosource.PlayOneShot(_onRumBuy[Random.Range(0,_onRumBuy.Count)]);
     }
     
+
     private void PlayRandomCoinsSound()
     {
         _audiosource.PlayOneShot(_coinSounds[Random.Range(0,_coinSounds.Count)]);
@@ -65,8 +45,27 @@ public class LootHandlerScript : MonoBehaviour
     {
         var cost = 0;
         Item item = other.GetComponentInChildren<Item>();
-        if (item != null)
+        if (item != null && item.hasBeenHit && !item.hasBeenBought)
         {
+            _ableToBuy = item.value >= 0 || -item.value <= _lootCounter;
+            if (!_ableToBuy)
+            {
+                item.ReturnItem();
+                item.hasBeenHit = false;
+                item.hasBeenBought = false;
+                return;
+            }
+            if (item.gameObject.name == "Rum")
+            {
+                PlayRandomRumSound();
+            }
+            else
+            {
+                PlayRandomCoinsSound();
+            }
+
+            item.hasBeenBought = true;
+            item.hasBeenHit = true;
             _lootCounter += item.value;
             lootCounterText.SetText(_lootCounter.ToString());
             lootCounterText.ForceMeshUpdate(true);
@@ -76,7 +75,16 @@ public class LootHandlerScript : MonoBehaviour
             {
                 topmostParent = topmostParent.parent;
             }
-            Destroy(topmostParent.gameObject);
+            var harpoons = topmostParent.transform.GetComponentsInChildren<Harpoon>();
+            for (var index = 0; index < harpoons.Length; index++)
+            {
+                var harpoon = harpoons[index];
+                harpoon.DestroyHarpoon();
+            }
+            if (item.destroyOnReceive)
+            {
+                Destroy(topmostParent.gameObject);
+            }
         }
     }
 }
